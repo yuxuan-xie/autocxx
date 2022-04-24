@@ -16,7 +16,7 @@ use crate::{
     known_types::{known_types, CxxGenericType},
     types::{make_ident, Namespace, QualifiedName},
 };
-use autocxx_parser::IncludeCppConfig;
+use autocxx_parser::{IncludeCppConfig, UnsafePolicy};
 use indexmap::map::IndexMap as HashMap;
 use indexmap::set::IndexSet as HashSet;
 use itertools::Itertools;
@@ -413,14 +413,25 @@ impl<'a> TypeConverter<'a> {
                 // a wobbler if not. rust::Str should only be seen _by value_ in C++
                 // headers; it manifests as &str in Rust but on the C++ side it must
                 // be a plain value. We should detect and abort.
-                let mut outer = elem.map(|elem| match mutability {
-                    Some(_) => Type::Path(parse_quote! {
-                        ::std::pin::Pin < & #mutability #elem >
-                    }),
-                    None => Type::Reference(parse_quote! {
-                        & #elem
-                    }),
-                });
+                let mut outer = if matches!(self.config.unsafe_policy, UnsafePolicy::ReferencesWrappedAllFunctionsSafe) {
+                    elem.map(|elem| match mutability {
+                        Some(_) => Type::Path(parse_quote! {
+                            ::autocxx::CppRef < #elem, ::autocxx::Mut >
+                        }),
+                        None => Type::Reference(parse_quote! {
+                            ::autocxx::CppRef < #elem, ::autocxx::Const >
+                        }),
+                    })
+                } else {
+                    elem.map(|elem| match mutability {
+                        Some(_) => Type::Path(parse_quote! {
+                            ::std::pin::Pin < & #mutability #elem >
+                        }),
+                        None => Type::Reference(parse_quote! {
+                            & #elem
+                        }),
+                    })
+                };
                 outer.kind = if mutability.is_some() {
                     TypeKind::MutableReference
                 } else {

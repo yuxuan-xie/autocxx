@@ -52,6 +52,7 @@ pub(crate) enum RustConversionType {
     FromValueParamToPtr,
     FromPlacementParamToNewReturn,
     FromRValueParamToPtr,
+    FromReferenceWrapperToPointer,
 }
 
 impl RustConversionType {

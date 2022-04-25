@@ -1745,6 +1745,12 @@ impl<'a> FnAnalyzer<'a> {
                         cpp_conversion: CppConversionType::FromPtrToValue,
                         rust_conversion: RustConversionType::FromRValueParamToPtr,
                     }
+                } else if matches!(self.config.unsafe_policy, UnsafePolicy::ReferencesWrappedAllFunctionsSafe) {
+                    TypeConversionPolicy {
+                        unwrapped_type: ty.clone(),
+                        cpp_conversion: CppConversionType::None,
+                        rust_conversion: RustConversionType::FromReferenceWrapperToPointer,
+                    }
                 } else {
                     TypeConversionPolicy {
                         unwrapped_type: ty.clone(),

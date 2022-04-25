@@ -53,6 +53,7 @@ pub(crate) enum RustConversionType {
     FromPlacementParamToNewReturn,
     FromRValueParamToPtr,
     FromReferenceWrapperToPointer,
+    FromPointerToReferenceWrapper,
 }
 
 impl RustConversionType {
@@ -88,6 +89,14 @@ impl TypeConversionPolicy {
             unwrapped_type: ty,
             cpp_conversion: CppConversionType::None,
             rust_conversion: RustConversionType::None,
+        }
+    }
+
+    pub(crate) fn return_reference_into_wrapper(ty: Type) -> Self {
+        TypeConversionPolicy {
+            unwrapped_type: ty,
+            cpp_conversion: CppConversionType::None,
+            rust_conversion: RustConversionType::FromPointerToReferenceWrapper,
         }
     }
 

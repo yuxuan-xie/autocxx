@@ -19,7 +19,7 @@ mod rvalue_param;
 pub mod subclass;
 mod value_param;
 
-pub use reference_wrapper::{CppRef, Const, Mut, CppRefMutability};
+pub use reference_wrapper::{Const, CppRef, CppRefMutability, Mut};
 
 #[cfg_attr(doc, aquamarine::aquamarine)]
 /// Include some C++ headers in your Rust project.

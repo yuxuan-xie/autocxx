@@ -1594,7 +1594,10 @@ impl<'a> FnAnalyzer<'a> {
                         is_placement_return_destination = construct_into_self;
                         if treat_this_as_reference {
                             pp.ident = Ident::new("self", pp.ident.span());
-                            if !matches!(self.config.unsafe_policy, UnsafePolicy::ReferencesWrappedAllFunctionsSafe) {
+                            if !matches!(
+                                self.config.unsafe_policy,
+                                UnsafePolicy::ReferencesWrappedAllFunctionsSafe
+                            ) {
                                 pointer_treatment = PointerTreatment::Reference;
                             }
                         }
@@ -1745,7 +1748,10 @@ impl<'a> FnAnalyzer<'a> {
                         cpp_conversion: CppConversionType::FromPtrToValue,
                         rust_conversion: RustConversionType::FromRValueParamToPtr,
                     }
-                } else if matches!(self.config.unsafe_policy, UnsafePolicy::ReferencesWrappedAllFunctionsSafe) {
+                } else if matches!(
+                    self.config.unsafe_policy,
+                    UnsafePolicy::ReferencesWrappedAllFunctionsSafe
+                ) {
                     TypeConversionPolicy {
                         unwrapped_type: ty.clone(),
                         cpp_conversion: CppConversionType::None,
@@ -1841,8 +1847,19 @@ impl<'a> FnAnalyzer<'a> {
                         }
                     }
                     _ => {
-                        let was_reference = matches!(boxed_type.as_ref(), Type::Reference(_));
-                        let conversion = Some(TypeConversionPolicy::new_unconverted(ty.clone()));
+                        let was_reference = references.ref_return;
+                        let conversion = Some(
+                            if was_reference
+                                && matches!(
+                                    self.config.unsafe_policy,
+                                    UnsafePolicy::ReferencesWrappedAllFunctionsSafe
+                                )
+                            {
+                                TypeConversionPolicy::return_reference_into_wrapper(ty.clone())
+                            } else {
+                                TypeConversionPolicy::new_unconverted(ty.clone())
+                            },
+                        );
                         ReturnTypeAnalysis {
                             rt: ReturnType::Type(*rarrow, boxed_type),
                             conversion,

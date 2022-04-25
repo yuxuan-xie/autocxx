@@ -262,9 +262,7 @@ impl Directive for Safety {
         let policy = &config.unsafe_policy;
         match config.unsafe_policy {
             crate::UnsafePolicy::AllFunctionsUnsafe => Box::new(std::iter::empty()),
-            _ => {
-                Box::new(std::iter::once(policy.to_token_stream()))
-            }
+            _ => Box::new(std::iter::once(policy.to_token_stream())),
         }
     }
 }

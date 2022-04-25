@@ -54,7 +54,10 @@ impl Parse for UnsafePolicy {
                 } else if id == "unsafe_references_wrapped" {
                     Ok(UnsafePolicy::ReferencesWrappedAllFunctionsSafe)
                 } else {
-                    Err(syn::Error::new(id.span(), "expected unsafe_ffi"))
+                    Err(syn::Error::new(
+                        id.span(),
+                        "expected unsafe_ffi or unsafe_references_wrapped",
+                    ))
                 }
             }
             None => Ok(UnsafePolicy::AllFunctionsUnsafe),

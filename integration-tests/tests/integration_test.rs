@@ -10912,6 +10912,40 @@ fn test_pass_rust_str_and_return_struct() {
     run_test(cxx, hdr, rs, &["take_str_return_struct"], &[]);
 }
 
+#[test]
+fn test_issue_1065() {
+    let hdr = indoc! {"
+        #include <memory>
+        #include <vector>
+
+        namespace as {
+        template <typename at> class au {
+        using av = at;
+        std::unique_ptr<av> aw;
+        };
+        } // namespace as
+        namespace az {
+        namespace ba {
+        class bb;
+        using bc = as::au<bb>;
+        } // namespace ba
+        } // namespace az
+        namespace content {
+        class RenderFrameHost {
+        public:
+        virtual std::vector<az::ba::bc> &bd() = 0;
+        };
+        } // namespace content
+    "};
+    let rs = quote! {
+    };
+    run_test_ex("", hdr, rs, quote! {
+        generate!("content::RenderFrameHost")
+        block!("perfetto::protos::pbzero::RenderFrameHost")
+    }, None, None, None);
+}
+
+
 // Yet to test:
 // - Ifdef
 // - Out param pointers

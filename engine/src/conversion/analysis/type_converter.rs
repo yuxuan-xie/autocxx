@@ -16,7 +16,7 @@ use crate::{
     known_types::{known_types, CxxGenericType},
     types::{make_ident, Namespace, QualifiedName},
 };
-use autocxx_parser::{IncludeCppConfig, UnsafePolicy};
+use autocxx_parser::{IncludeCppConfig};
 use indexmap::map::IndexMap as HashMap;
 use indexmap::set::IndexSet as HashSet;
 use itertools::Itertools;

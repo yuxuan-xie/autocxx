@@ -413,16 +413,7 @@ impl<'a> TypeConverter<'a> {
                 // a wobbler if not. rust::Str should only be seen _by value_ in C++
                 // headers; it manifests as &str in Rust but on the C++ side it must
                 // be a plain value. We should detect and abort.
-                let mut outer = if matches!(self.config.unsafe_policy, UnsafePolicy::ReferencesWrappedAllFunctionsSafe) {
-                    elem.map(|elem| match mutability {
-                        Some(_) => Type::Path(parse_quote! {
-                            ::autocxx::CppRef < #elem, ::autocxx::Mut >
-                        }),
-                        None => Type::Reference(parse_quote! {
-                            ::autocxx::CppRef < #elem, ::autocxx::Const >
-                        }),
-                    })
-                } else {
+                let mut outer = 
                     elem.map(|elem| match mutability {
                         Some(_) => Type::Path(parse_quote! {
                             ::std::pin::Pin < & #mutability #elem >
@@ -431,7 +422,7 @@ impl<'a> TypeConverter<'a> {
                             & #elem
                         }),
                     })
-                };
+                ;
                 outer.kind = if mutability.is_some() {
                     TypeKind::MutableReference
                 } else {

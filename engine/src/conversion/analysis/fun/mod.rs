@@ -1594,7 +1594,9 @@ impl<'a> FnAnalyzer<'a> {
                         is_placement_return_destination = construct_into_self;
                         if treat_this_as_reference {
                             pp.ident = Ident::new("self", pp.ident.span());
-                            pointer_treatment = PointerTreatment::Reference;
+                            if !matches!(self.config.unsafe_policy, UnsafePolicy::ReferencesWrappedAllFunctionsSafe) {
+                                pointer_treatment = PointerTreatment::Reference;
+                            }
                         }
                         syn::Pat::Ident(pp)
                     }
